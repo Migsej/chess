@@ -2,21 +2,20 @@
 #include <stdint.h>
 
 int32_t countpieces(uint64_t bitboard, int value) {
-	int result = 0;
-	while (bitboard) {
-		result += (bitboard & 1) * value;
-		bitboard >>= 1;
+	int32_t result;
+	for(result = 0; bitboard; result++) {
+		bitboard &= bitboard -1;
 	}
 	return result;
 }
 
+const int values[] = {1,3,3,5,9};
+
 int32_t countpicesboard(uint64_t pieces[6]) {
 		int result = 0;
-		result += countpieces(pieces[PAWN], 1);
-		result += countpieces(pieces[KNIGHT], 3);
-		result += countpieces(pieces[BISHOP], 3);
-		result += countpieces(pieces[ROOK], 5);
-		result += countpieces(pieces[QUEEN], 9);
+		for (int i = PAWN; i < KING;++i) {
+			result += countpieces(pieces[i], values[i]);
+		}
 		if (!countpieces(pieces[KING], 1)) {
 			result = INT32_MAX;
 		}

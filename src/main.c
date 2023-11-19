@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "chess.h"
 
 int main(void) {
@@ -18,6 +19,7 @@ int main(void) {
 	}
 
 	printf("Value: %d\n", value);
+	free(newboards);
 	return 0;
 }
 
