@@ -146,64 +146,66 @@ int newknightpositions[8][3] = {
 };
 
 void bishopmoves(Board board, Board *moves, int *nummoves, char *pos, int direction) {
-	if (direction == 0) {
-	char startsquare = direction ? '1' : 'a';
-	for (int j = 0; j < 8; j++) {
+	for (int j = 1; j < 8; j++) {
 		char newpos[2];
-		if (direction) {
-			newpos[0] = pos[0];
-			newpos[1] = j;
-		} else {
-			newpos[0] = 'a' + j;
-			newpos[1] =	'1' + j;
+		if (direction == 0) {
+			newpos[0] = pos[0] + j;
+			newpos[1] = pos[1] + j;
+		} else if (direction == 1) {
+			newpos[0] = pos[0] - j;
+			newpos[1] =	pos[1] - j;
+		} else if (direction == 2) {
+			newpos[0] =	pos[0] + j;
+			newpos[1] = pos[1] - j;
+		} else if (direction == 3) {
+			newpos[0] =	pos[0] - j;
+			newpos[1] = pos[1] + j;
 		}
-
-		if (!isvalidpos(newpos)) { 
-			/*
-			if (j <= pos[direction]) {
-				j = pos[direction];
-				continue;
-			} else {
-				break;
-			}
-			*/
+		uint64_t *curpieces = board.white_to_move ? board.white : board.black;
+		uint64_t *notcurpieces = !board.white_to_move ? board.white : board.black;
+		if (!isvalidpos(newpos)) {
+			continue;
+		}
+		if (isemptysquare(curpieces, newpos) && isemptysquare(notcurpieces, newpos) ) { 
+			apply_position(board, moves, nummoves, newpos, pos, BISHOP);
 			continue;
 		} 
-		apply_position(board, moves, nummoves, newpos, pos, BISHOP);
-	}
+		if (!isemptysquare(notcurpieces, newpos)) {
+			apply_position(board, moves, nummoves, newpos, pos, BISHOP);
+		}
+		break;
 	}
 }
 
 void rookmoves(Board board, Board *moves, int *nummoves, char *pos, int direction) {
-	char startsquare = direction ? '1' : 'a';
-	for (int j = startsquare; j < startsquare + 8; j++) {
+	for (int j = 1; j < 8; j++) {
 		char newpos[2];
-		if (direction) {
-			newpos[0] = pos[0];
-			newpos[1] = j;
-		} else {
-			newpos[0] = j;
+		if (direction == 0) {
+			newpos[0] = pos[0] + j;
+			newpos[1] = pos[1];
+		} else if (direction == 1) {
+			newpos[0] = pos[0] - j;
 			newpos[1] =	pos[1];
+		} else if (direction == 2) {
+			newpos[0] =	pos[0];
+			newpos[1] = pos[1] - j;
+		} else if (direction == 3) {
+			newpos[0] =	pos[0];
+			newpos[1] = pos[1] + j;
 		}
 		uint64_t *curpieces = board.white_to_move ? board.white : board.black;
 		uint64_t *notcurpieces = !board.white_to_move ? board.white : board.black;
-		if (!(isvalidpos(newpos) && isemptysquare(curpieces, newpos) )) { 
-			if (j <= pos[direction]) {
-				j = pos[direction];
-				continue;
-			} else {
-				break;
-			}
-		} else if (!isemptysquare(notcurpieces, newpos)) {
-			apply_position(board, moves, nummoves, newpos, pos, ROOK);
-			if (j <= pos[direction]) {
-				j = pos[direction];
-				continue;
-			} else {
-				break;
-			}
+		if (!isvalidpos(newpos)) {
+			continue;
 		}
-		apply_position(board, moves, nummoves, newpos, pos, ROOK);
+		if (isemptysquare(curpieces, newpos) && isemptysquare(notcurpieces, newpos) ) { 
+			apply_position(board, moves, nummoves, newpos, pos, ROOK);
+			continue;
+		} 
+		if (!isemptysquare(notcurpieces, newpos)) {
+			apply_position(board, moves, nummoves, newpos, pos, ROOK);
+		}
+		break;
 	}
 }
 
@@ -235,10 +237,14 @@ Board *getmoves(Board board, int32_t *nummoves) {
 		} else if (curpieces[ROOK] & square) {
 			rookmoves(board, moves, nummoves, pos, 0);
 			rookmoves(board, moves, nummoves, pos, 1);
+			rookmoves(board, moves, nummoves, pos, 2);
+			rookmoves(board, moves, nummoves, pos, 3);
 		//BISHOPS
 		} else if (curpieces[BISHOP] & square) {
 			bishopmoves(board, moves, nummoves, pos, 0);
 			bishopmoves(board, moves, nummoves, pos, 1);
+			bishopmoves(board, moves, nummoves, pos, 2);
+			bishopmoves(board, moves, nummoves, pos, 3);
 
 		}
 
