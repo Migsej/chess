@@ -21,7 +21,7 @@ int calculatepos(char *pos) {
 
 Board load_fen(char *fen) {
 	Board board = {0};
-	char pos[3] = "a1";
+	char pos[3] = "a8";
 	while (*fen != ' ') {
 		for (int i = PAWN; i < LAST; ++i) {
 			if (*fen == letters[i]) {
@@ -39,7 +39,7 @@ Board load_fen(char *fen) {
 
 		if (*fen == '/') {
 			pos[0] = 'a' -1 ;
-			pos[1]++;
+			pos[1]--;
 		}
 
 		pos[0]++;
@@ -61,8 +61,9 @@ char findchar(uint64_t *pieces, char shift, uint64_t square) {
 }
 
 void drawpieces(Board board) {
+	char pos[3] = "a8";
 	for (int i = 0; i < 64; i++) {
-		uint64_t square = 1ul << i;
+		uint64_t square = 1ul << calculatepos(pos);
 
 		uint64_t *curpieces = board.black;
 		char mult = 0;
@@ -76,7 +77,10 @@ void drawpieces(Board board) {
 
 		if (i % 8 == 7) {
 			printf("\n");
+			pos[0] = 'a' - 1;
+			pos[1]--;
 		}
+		pos[0]++;
 	}
 
 }
@@ -245,8 +249,46 @@ Board *getmoves(Board board, int32_t *nummoves) {
 			bishopmoves(board, moves, nummoves, pos, 1);
 			bishopmoves(board, moves, nummoves, pos, 2);
 			bishopmoves(board, moves, nummoves, pos, 3);
-
+		//QUEENS
+		} else if (curpieces[QUEEN] & square) {
+			bishopmoves(board, moves, nummoves, pos, 0);
+			bishopmoves(board, moves, nummoves, pos, 1);
+			bishopmoves(board, moves, nummoves, pos, 2);
+			bishopmoves(board, moves, nummoves, pos, 3);
+			rookmoves(board, moves, nummoves, pos, 0);
+			rookmoves(board, moves, nummoves, pos, 1);
+			rookmoves(board, moves, nummoves, pos, 2);
+			rookmoves(board, moves, nummoves, pos, 3);
+	} else if (curpieces[PAWN] & square) {
+		char newpos[3];
+		newpos[0] = pos[0];
+		if (board.white_to_move) {
+			newpos[1] = pos[1] + 1;
+		} else {
+			newpos[1] = pos[1] - 1;
 		}
+		uint64_t *notcurpieces = !board.white_to_move ? board.white : board.black;
+		if (isvalidpos(newpos) && isemptysquare(curpieces, newpos) && isemptysquare(notcurpieces, newpos)) {
+			apply_position(board, moves, nummoves, newpos, pos, PAWN);
+		}
+
+
+		if (board.white_to_move && pos[1] == '2') {
+			newpos[0] = pos[0];
+			newpos[1] = pos[1] + 2;
+
+		} else if (!board.white_to_move && pos[1] == '7') {
+			newpos[0] = pos[0];
+			newpos[1] = pos[1] - 2;
+		} else {
+			newpos[0] = '\0';
+		}		
+		if (isvalidpos(newpos) && isemptysquare(curpieces, newpos) && isemptysquare(notcurpieces, newpos)) {
+			apply_position(board, moves, nummoves, newpos, pos, PAWN);
+		}
+		
+	}
+
 
 		pos[0]++;
 		if (pos[0] > 'h') {
