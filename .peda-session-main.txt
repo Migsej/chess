@@ -1,3 +1,0 @@
-break /home/vincent/chess/src/main.c:37
-break apply_position
-

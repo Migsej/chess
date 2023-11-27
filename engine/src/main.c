@@ -26,7 +26,7 @@ int main(void) {
 	//drawboard(newboard);
 	printf("\n");
 	bool max = true;
-	for (int i = 0; i < 20; i++) {
+	for (int i = 0; i < 70; i++) {
 		max = !max;
 		newboard = minimax(newboard, 5, max);
 		drawboard(newboard);
