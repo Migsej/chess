@@ -29,7 +29,6 @@ void printboard(Board *board);
 
 int32_t valueboard(Board board);
 
-Board *getmoves(Board board, int32_t *nummoves);
+void getmoves(Board board, int32_t *nummoves, Board *moves);
 
-
-
+Board minimax(Board board, int32_t depth, bool maximizingPlayer);

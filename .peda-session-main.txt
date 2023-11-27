@@ -1,3 +1,3 @@
-break util.c:262
-break util.c:272
+break /home/vincent/chess/src/main.c:37
+break apply_position
 
