@@ -1,7 +1,9 @@
 import pygame as pg
 import os
+import time
 
 import communicate
+pg.init()
 
 piecenames = {
     "p" : "pawn",
@@ -56,7 +58,7 @@ def load_board(board):
 
 WIDTH, HEIGHT = 800,800
 
-fps = 60
+fps = 3
 
 screen = pg.display.set_mode((WIDTH, HEIGHT))
 
@@ -71,19 +73,21 @@ for path in os.listdir(piecespath):
     image = pg.transform.scale(image,(WIDTH//8,WIDTH//8))
     piecesmap[path] = image
 
-board = pg.transform.scale(pg.image.load("./Chessboard_green_squares.png"),(WIDTH,HEIGHT))
+chessboard = pg.transform.scale(pg.image.load("./Chessboard_green_squares.png"),(WIDTH,HEIGHT))
 
 
-startfen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w"
+board = communicate.load_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w")
 
-def drawfen(fen: str, screen):
-    board = communicate.load_fen(fen)
+def drawboard(board, screen):
     for (x,y), path in load_board(board) :
         realpos = ((ord(x) - ord('a')) * WIDTH//8, ((8- y) * HEIGHT // 8))
         screen.blit(piecesmap[path], realpos)
     
 
 
+
+font = pg.font.SysFont(None, 50)
+BLUE = (0,0,255)
 
 while running:
     for event in pg.event.get():
@@ -95,8 +99,14 @@ while running:
 
 
     screen.fill((255,255,255))
-    screen.blit(board, (0,0))    
-    drawfen(startfen, screen)
+    screen.blit(chessboard, (0,0))    
+    drawboard(board, screen)
+    
+    t0 = time.time()
+    board = communicate.minimax(board, 4, True)
+    t1 = time.time()
+    img = font.render(f"Time taken: {t1 - t0:.2f} seconds", True, BLUE)
+    screen.blit(img, (0, 0))
 
     pg.display.flip()
     clock.tick(fps)
