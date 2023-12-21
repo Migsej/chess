@@ -30,7 +30,11 @@ int32_t valueboard(Board board) {
 	return result;
 }
 
-Board minimax(Board board, int32_t depth, bool maximizing_player) {
+Board call_minimax(Board board, int32_t depth, bool maximizing_player) {
+	return minimax(board, depth, maximizing_player, -INT32_MAX, INT32_MAX);
+}
+
+Board minimax(Board board, int32_t depth, bool maximizing_player, int32_t alpha, int32_t beta) {
 	if (depth == 0) {
 		return board;
 	}
@@ -40,17 +44,25 @@ Board minimax(Board board, int32_t depth, bool maximizing_player) {
 	getmoves(board, &nummoves, moves);
 	Board bestmove = {0};
 	for (int i = 0; i < nummoves; ++i) {
-		Board newboard = minimax(moves[i], depth - 1, !maximizing_player);
+		Board newboard = minimax(moves[i], depth - 1, !maximizing_player, alpha, beta);
 		int32_t newvalue = valueboard(newboard);
 		if (maximizing_player) {
 			if (newvalue > value) {
 				value = newvalue;
 				bestmove = moves[i];
 			}
+			if (value > beta) break;
+			if (alpha < value) {
+				alpha = value;
+			}
 		} else {
 			if (newvalue < value) {
 				value = newvalue;
 				bestmove = moves[i];
+			}
+			if (value < alpha) break;
+			if (beta > value) {
+				beta = value;
 			}
 		}
 	}

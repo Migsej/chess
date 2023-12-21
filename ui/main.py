@@ -89,6 +89,8 @@ def drawboard(board, screen):
 font = pg.font.SysFont(None, 50)
 BLUE = (0,0,255)
 
+max = False
+
 while running:
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -101,9 +103,9 @@ while running:
     screen.fill((255,255,255))
     screen.blit(chessboard, (0,0))    
     drawboard(board, screen)
-    
+    max = not max 
     t0 = time.time()
-    board = communicate.minimax(board, 4, True)
+    board = communicate.minimax(board, 4, max)
     t1 = time.time()
     img = font.render(f"Time taken: {t1 - t0:.2f} seconds", True, BLUE)
     screen.blit(img, (0, 0))

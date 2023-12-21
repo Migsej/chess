@@ -39,13 +39,13 @@ lib.load_fen.restype = Board
 
 
 #Board minimax(Board board, int32_t depth, bool maximizingPlayer);
-lib.minimax.argtypes = [Board, c_int32, c_bool]
-lib.minimax.restype = Board
+lib.call_minimax.argtypes = [Board, c_int32, c_bool]
+lib.call_minimax.restype = Board
 
 def load_fen(fen):
     return lib.load_fen(fen.encode())
 
-def minimax(board, depth, maximizingPlayer):
-    return lib.minimax(board, depth, maximizingPlayer)
+def minimax(board, depth, max):
+    return lib.call_minimax(board, depth, max)
 
 

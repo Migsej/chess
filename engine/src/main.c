@@ -22,13 +22,13 @@ int main(void) {
 	//Board board = load_fen("k2prp2/pppp1ppp/8/8/8/8/8/4K3 b");
 	//Board board = load_fen("8/8/8/3p4/2q5/3P4/8/8 b");
 	drawboard(board);
-	Board newboard = minimax(board, 5, true);
+	Board newboard = call_minimax(board, 5, true);
 	//drawboard(newboard);
 	printf("\n");
 	bool max = true;
 	for (int i = 0; i < 70; i++) {
 		max = !max;
-		newboard = minimax(newboard, 5, max);
+		newboard = call_minimax(newboard, 5, max);
 		drawboard(newboard);
 		printf("value: %d\n", valueboard(newboard));
 		printf("\n");

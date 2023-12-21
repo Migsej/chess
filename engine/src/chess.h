@@ -31,4 +31,6 @@ int32_t valueboard(Board board);
 
 void getmoves(Board board, int32_t *nummoves, Board *moves);
 
-Board minimax(Board board, int32_t depth, bool maximizingPlayer);
+Board minimax(Board board, int32_t depth, bool maximizing_player, int32_t alpha, int32_t beta);
+
+Board call_minimax(Board board, int32_t depth, bool maximizing_player);

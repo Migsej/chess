@@ -27,3 +27,4 @@ libmain.o: src/main.c
 clean:
 	rm -f main
 	rm -f *.o
+	rm -f *.so
