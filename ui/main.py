@@ -1,6 +1,8 @@
 import pygame as pg
 import os
 
+import communicate
+
 piecenames = {
     "p" : "pawn",
     "r" : "rook",
@@ -10,35 +12,49 @@ piecenames = {
     "k" : "king"
 }
 
-def load_fen(fen):
-    result = []
-    pos = [ord('a') - 1, 8]
-    for c in fen:
-        if c.isnumeric():
-            for i in range(8):
-                if c == chr(ord('1') + i):
-                    pos[0] += i + 1
-            continue
+def calculatepos(pos):
+    file = pos[0] - ord('a')
+    rank = pos[1] - 1
+    return rank * 8 + file
 
-        if c == '/':
-            pos[1] -= 1
-            pos[0] = ord('a') - 1 
-            continue
-        if c == ' ':
-            break
-        # we know that it is a piece now
-        if c.isupper():
+
+def findchar(square, pieces):
+    for i in range(6):
+        if pieces[i] & square:
+            return list(piecenames.keys())[i]
+    return '.'
+
+
+def load_board(board):
+    result = []
+    pos = [ord('a'), 8]
+    for p in range(64):
+        square = 1 << calculatepos(pos)
+
+        c = findchar(square, board.white) 
+        if c != '.':
             color = "white" 
-            piece = piecenames[chr(ord(c) - ord('A') + ord('a'))]
-        else :
-            color = "black" 
             piece = piecenames[c]
+        else :
+            c = findchar(square, board.black) 
+            if c != '.':
+                color = "black" 
+                piece = piecenames[c]
+            else:
+                if p % 8 == 7:
+                    pos[0] = ord('a') - 1
+                    pos[1] -= 1
+                pos[0] += 1
+                continue
         r, c = pos
-        result.append(((chr(r + 1), c), f"{color}-{piece}.png"))
+        result.append(((chr(r), c), f"{color}-{piece}.png"))
+        if p % 8 == 7:
+            pos[0] = ord('a') - 1
+            pos[1] -= 1
         pos[0] += 1
     return result
 
-WIDTH, HEIGHT = 400,400
+WIDTH, HEIGHT = 800,800
 
 fps = 60
 
@@ -55,16 +71,15 @@ for path in os.listdir(piecespath):
     image = pg.transform.scale(image,(WIDTH//8,WIDTH//8))
     piecesmap[path] = image
 
-board = pg.transform.scale(pg.image.load("./Chessboard_green_squares.png"),(400,400))
+board = pg.transform.scale(pg.image.load("./Chessboard_green_squares.png"),(WIDTH,HEIGHT))
 
 
 startfen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w"
-startfen = "4k3/pppp1ppp/8/8/4N3/8/8/4K3 b"
 
 def drawfen(fen: str, screen):
-    for (x,y), path in load_fen(fen) :
+    board = communicate.load_fen(fen)
+    for (x,y), path in load_board(board) :
         realpos = ((ord(x) - ord('a')) * WIDTH//8, ((8- y) * HEIGHT // 8))
-        print(realpos)
         screen.blit(piecesmap[path], realpos)
     
 
