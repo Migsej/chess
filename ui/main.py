@@ -105,7 +105,7 @@ while running:
     drawboard(board, screen)
     max = not max 
     t0 = time.time()
-    board = communicate.minimax(board, 4, max)
+    board = communicate.minimax(board, 5, max)
     t1 = time.time()
     img = font.render(f"Time taken: {t1 - t0:.2f} seconds", True, BLUE)
     screen.blit(img, (0, 0))

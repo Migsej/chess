@@ -2,20 +2,27 @@
 #include <stdbool.h>
 
 typedef enum {
-	PAWN,
-	ROOK,
-	KNIGHT,
-	BISHOP,
-	QUEEN,
-	KING,
-	LAST
+  PAWN,
+  ROOK,
+  KNIGHT,
+  BISHOP,
+  QUEEN,
+  KING,
+  LAST
 } Piece;
 
+typedef enum {
+  WHITE_TO_MOVE,
+  WHITE_KINGSIDE,
+  WHITE_QUEENSIDE,
+  BLACK_KINGSIDE,
+  BLACK_QUEENSIDE,
+} Flags;
 
 typedef struct {
-	uint64_t white[6];
-	uint64_t black[6];
-	bool white_to_move;
+  uint64_t white[6];
+  uint64_t black[6];
+  uint8_t flags;
 } Board;
 
 
