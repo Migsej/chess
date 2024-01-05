@@ -47,7 +47,7 @@ Board load_fen(char *fen) {
     fen++;
   }
   fen++;
-  board.flags |= (*fen == 'w') ;
+  board.flags = (*fen == 'w') << WHITE_TO_MOVE ;
   return board;
 }
 
@@ -121,8 +121,10 @@ void apply_position(Board board, Board *moves, int *nummoves, char *newpos, char
   (*nummoves)++;
   assert(*nummoves < 1024);
   Board newboard = board;
-  uint64_t *curpieces = ((newboard.flags >> WHITE_TO_MOVE) | 1) ? newboard.white : newboard.black;
-  uint64_t *notcurpieces = !((newboard.flags >> WHITE_TO_MOVE) | 1) ? newboard.white : newboard.black;
+  uint64_t *curpieces = (board.flags & (1 << WHITE_TO_MOVE)) ? newboard.white : newboard.black;
+  uint64_t *notcurpieces = (board.flags & (1 << WHITE_TO_MOVE)) ? newboard.black : newboard.white;
+  //uint64_t *curpieces = ((newboard.flags >> WHITE_TO_MOVE) | 1) ? newboard.white : newboard.black;
+  //uint64_t *notcurpieces = !((newboard.flags >> WHITE_TO_MOVE) | 1) ? newboard.white : newboard.black;
   movepice(&curpieces[king_field], pos, newpos);
 
   for (int i = PAWN; i < LAST; i++) {
@@ -176,8 +178,10 @@ void bishopmoves(Board board, Board *moves, int *nummoves, char *pos, int direct
       newpos[0] =	pos[0] - j;
       newpos[1] = pos[1] + j;
     }
-    uint64_t *curpieces = ((board.flags >> WHITE_TO_MOVE) | 1) ? board.white : board.black;
-    uint64_t *notcurpieces = !((board.flags >> WHITE_TO_MOVE) | 1) ? board.white : board.black;
+    uint64_t *curpieces = (board.flags & (1 << WHITE_TO_MOVE)) ? board.white : board.black;
+    uint64_t *notcurpieces = (board.flags & (1 << WHITE_TO_MOVE)) ? board.black : board.white;
+    //uint64_t *curpieces = ((board.flags >> WHITE_TO_MOVE) | 1) ? board.white : board.black;
+    //uint64_t *notcurpieces = !((board.flags >> WHITE_TO_MOVE) | 1) ? board.white : board.black;
     if (!isvalidpos(newpos)) {
       continue;
     }
@@ -208,8 +212,10 @@ void rookmoves(Board board, Board *moves, int *nummoves, char *pos, int directio
       newpos[0] =	pos[0];
       newpos[1] = pos[1] + j;
     }
-    uint64_t *curpieces = ((board.flags >> WHITE_TO_MOVE) | 1) ? board.white : board.black;
-    uint64_t *notcurpieces = !((board.flags >> WHITE_TO_MOVE) | 1) ? board.white : board.black;
+    uint64_t *curpieces = (board.flags & (1 << WHITE_TO_MOVE)) ? board.white : board.black;
+    uint64_t *notcurpieces = (board.flags & (1 << WHITE_TO_MOVE)) ? board.black : board.white;
+    //uint64_t *curpieces = ((board.flags >> WHITE_TO_MOVE) | 1) ? board.white : board.black;
+    //uint64_t *notcurpieces = !((board.flags >> WHITE_TO_MOVE) | 1) ? board.white : board.black;
     if (!isvalidpos(newpos)) {
       continue;
     }
@@ -226,8 +232,10 @@ void rookmoves(Board board, Board *moves, int *nummoves, char *pos, int directio
 
 void getmoves(Board board, int32_t *nummoves, Board *moves) {
   char pos[3] = "a1";
-  uint64_t *curpieces = ((board.flags >> WHITE_TO_MOVE ) | 1) ? board.white : board.black;
-  uint64_t *notcurpieces = !((board.flags >> WHITE_TO_MOVE) | 1) ? board.white : board.black;
+  uint64_t *curpieces = (board.flags & (1 << WHITE_TO_MOVE)) ? board.white : board.black;
+  uint64_t *notcurpieces = (board.flags & (1 << WHITE_TO_MOVE)) ? board.black : board.white;
+  //uint64_t *curpieces = ((board.flags >> WHITE_TO_MOVE ) | 1) ? board.white : board.black;
+  //uint64_t *notcurpieces = !((board.flags >> WHITE_TO_MOVE) | 1) ? board.white : board.black;
   for (int i = 0;i < 64; i++) {
     uint64_t square = 1ul << i;
     //KINGS
@@ -273,8 +281,8 @@ void getmoves(Board board, int32_t *nummoves, Board *moves) {
     } else if (curpieces[PAWN] & square) {
       char newpos[3];
       newpos[0] = pos[0];
-      newpos[1] = ((board.flags >> WHITE_TO_MOVE) | 1) ? pos[1] + 1 : pos[1] - 1;
-
+      //newpos[1] = ((board.flags >> WHITE_TO_MOVE) | 1) ? pos[1] + 1 : pos[1] - 1;
+      newpos[1] = (board.flags & (1 << WHITE_TO_MOVE)) ? pos[1] + 1 : pos[1] - 1;
       if (isvalidpos(newpos) && isemptysquare(curpieces, newpos) && isemptysquare(notcurpieces, newpos)) {
 	apply_position(board, moves, nummoves, newpos, pos, PAWN);
       }
@@ -289,9 +297,9 @@ void getmoves(Board board, int32_t *nummoves, Board *moves) {
       }
 
       newpos[0] = pos[0];
-      if (((board.flags >> WHITE_TO_MOVE) | 1) && pos[1] == '2') {
+      if (board.flags & (1 << WHITE_TO_MOVE) && pos[1] == '2') {
 	newpos[1] = pos[1] + 2;
-      } else if (!((board.flags >> WHITE_TO_MOVE) | 1) && pos[1] == '7') {
+      } else if (!(board.flags & (1 << WHITE_TO_MOVE)) && pos[1] == '7') {
 	newpos[1] = pos[1] - 2;
       } else {
 	newpos[1] = '\0';

@@ -12,7 +12,7 @@ typedef enum {
 } Piece;
 
 typedef enum {
-  WHITE_TO_MOVE,
+  WHITE_TO_MOVE = 2,
   WHITE_KINGSIDE,
   WHITE_QUEENSIDE,
   BLACK_KINGSIDE,
@@ -22,7 +22,7 @@ typedef enum {
 typedef struct {
   uint64_t white[6];
   uint64_t black[6];
-  uint8_t flags;
+  unsigned char flags;
 } Board;
 
 
